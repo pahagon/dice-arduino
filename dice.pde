@@ -66,14 +66,17 @@ void FlashingLed::Blink() {
 class Face {
   private:
     Led leds[4];
-    int par_leds_to_turn_on;
-    boolean is_turn_on_unit_lend;
+    int num_pair_leds_to_turn_on;
+    boolean is_odd_number;
   public:
     Face();
     void SetNumber(int number);
     void TurnOn();
     void TurnOff();
+    void IsOn();
+   protected:
     boolean isOn;
+    void Turn(boolean turn);
 };
 
 Face::Face(){
@@ -84,30 +87,28 @@ Face::Face(){
 
 void Face::SetNumber(int n) {
  if(n == 1)
-    par_leds_to_turn_on = 0;
+    num_pair_leds_to_turn_on = 0;
   else
-    par_leds_to_turn_on= n / 2;
-  is_turn_on_unit_lend = n % 2 == 1; 
+    num_pair_leds_to_turn_on= n / 2;
+  is_odd_number = n % 2 == 1; 
 }
 
 void Face::TurnOn() {
-  if( isOn )
-    return;
-  if( is_turn_on_unit_lend )
-    leds[0].TurnOn();
-  for( int numLed = 1; numLed <= par_leds_to_turn_on;  numLed++ )
-    leds[numLed].TurnOn();
-  isOn = true;
+  Turn(true);
 };
 
 void Face::TurnOff() {
-  if( !isOn )
+  Turn(false);
+};
+
+void Face::Turn(boolean turn) {
+  if( isOn == turn )
     return;
-  if( is_turn_on_unit_lend )
-    leds[0].TurnOff();
-  for( int numLed = 1; numLed <= par_leds_to_turn_on;  numLed++ )
-    leds[numLed].TurnOff();
-  isOn = false;
+  if( is_odd_number )
+    turn ? leds[0].TurnOn() : leds[0].TurnOff();
+  for( int numLed = 1; numLed <= num_pair_leds_to_turn_on;  numLed++ )
+    turn ? leds[numLed].TurnOn() : leds[numLed].TurnOff();
+  isOn = turn;
 };
 
 class Dice {
@@ -119,6 +120,8 @@ class Dice {
     void TurnOffFace(int n);
     void TurnOnAllFaces();
     void Launch();
+  protected:
+    void TurnFace(int numFace, boolean turn);
 };
 
 Dice::Dice() {
@@ -127,12 +130,16 @@ Dice::Dice() {
 };
 
 void Dice::TurnOnFace(int number) {
-  faces[number-1].TurnOn();
+  TurnFace(number,true);
 };
 
 void Dice::TurnOffFace(int number) {
-  faces[number-1].TurnOff();
+ TurnFace(number,false);
 };
+
+void Dice::TurnFace(int numFace, boolean turn) {
+  turn ? faces[numFace-1].TurnOn() : faces[numFace-1].TurnOff();
+}
 
 void Dice::Launch() {
   long num = random(1,7);
