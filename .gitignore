@@ -3,3 +3,7 @@
 *.log
 *.o
 *.a
+*.epp
+*.elf
+*.hex
+
